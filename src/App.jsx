@@ -42,7 +42,7 @@ function Nav() {
       padding: "0 32px", display: "flex", alignItems: "center", height: 56,
     }}>
       <a href="#/" style={{ fontFamily: sans, fontSize: 14, fontWeight: 700, color: C.gold, textDecoration: "none", letterSpacing: "0.06em", marginRight: 48 }}>
-        NSM1 EXPLORER
+        ZAP1 EXPLORER
       </a>
       {links.map(([href, label]) => (
         <a key={href} href={href} style={{
@@ -513,8 +513,8 @@ export default function App() {
       </div>
       <footer style={{ borderTop: `1px solid ${C.border}`, padding: "24px 32px", maxWidth: 1000, margin: "0 auto" }}>
         <div style={{ display: "flex", justifyContent: "space-between", fontFamily: mono, fontSize: 10, color: C.muted }}>
-          <span>NSM1 Explorer · <a href="https://frontiercompute.io" target="_blank" rel="noopener" style={{ color: C.dim, textDecoration: "none" }}>Frontier Compute</a></span>
-          <span>Protocol: NSM1 · Zcash Mainnet</span>
+          <span>ZAP1 Explorer · <a href="https://frontiercompute.io" target="_blank" rel="noopener" style={{ color: C.dim, textDecoration: "none" }}>Frontier Compute</a></span>
+          <span>Protocol: ZAP1 · Zcash Mainnet</span>
         </div>
       </footer>
     </div>

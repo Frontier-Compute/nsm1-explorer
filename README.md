@@ -1,10 +1,10 @@
-# nsm1-explorer
+# zap1-explorer
 
-NSM1 attestation explorer for Zcash mainnet.
+ZAP1 attestation explorer for Zcash mainnet.
 
 ## What it does
 
-Single-page React app that queries the NSM1 backend and displays:
+Single-page React app that queries the ZAP1 backend and displays:
 
 - **Dashboard** - total leaves, anchor count, event type distribution (pie chart), anchor history timeline, anchor transaction table with links to zcashblockexplorer.com
 - **Leaves** - browse lifecycle events by wallet hash, view event types, leaf hashes, anchor status
@@ -24,8 +24,8 @@ Vite dev server starts on `http://localhost:5173`. The app hits the production A
 
 ## Links
 
-- [NSM1 protocol spec](https://github.com/Frontier-Compute/nsm1/blob/main/ONCHAIN_PROTOCOL.md)
-- [nsm1-verify crate](https://github.com/Frontier-Compute/nsm1-verify)
+- [ZAP1 protocol spec](https://github.com/Frontier-Compute/zap1/blob/main/ONCHAIN_PROTOCOL.md)
+- [zap1-verify crate](https://github.com/Frontier-Compute/zap1-verify)
 
 ## License
 
