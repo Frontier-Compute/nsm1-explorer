@@ -1,5 +1,7 @@
 # zap1-explorer
 
+[![ci](https://github.com/Frontier-Compute/zap1-explorer/actions/workflows/ci.yml/badge.svg)](https://github.com/Frontier-Compute/zap1-explorer/actions/workflows/ci.yml)
+
 ZAP1 attestation explorer for Zcash mainnet.
 
 ## What it does
