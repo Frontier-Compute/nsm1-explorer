@@ -298,7 +298,7 @@ function Leaves() {
                 </td>
                 <td style={{ padding: "10px 12px", color: C.muted, fontSize: 11 }}>{ev.anchor_height?.toLocaleString() || "-"}</td>
                 <td style={{ padding: "10px 12px" }}>
-                  <a href={`#/leaf/${ev.leaf_hash}`} style={{ color: C.gold, textDecoration: "none", fontSize: 11 }}>View →</a>
+                  <a href={`#/leaf/${ev.leaf_hash}`} style={{ color: C.gold, textDecoration: "none", fontSize: 11 }}>View ></a>
                 </td>
               </tr>
             ))}
@@ -475,7 +475,7 @@ function Search() {
                 <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 3, background: (TYPE_COLORS[ev.event_type] || "#555") + "20", color: TYPE_COLORS[ev.event_type] || "#999", fontFamily: mono }}>{ev.event_type}</span>
                 <span style={{ fontFamily: mono, fontSize: 11, color: C.dim }}>{truncHash(ev.leaf_hash, 10)}</span>
               </div>
-              <a href={`#/leaf/${ev.leaf_hash}`} style={{ fontFamily: mono, fontSize: 11, color: C.gold, textDecoration: "none" }}>View →</a>
+              <a href={`#/leaf/${ev.leaf_hash}`} style={{ fontFamily: mono, fontSize: 11, color: C.gold, textDecoration: "none" }}>View ></a>
             </div>
           ))}
         </div>
@@ -483,7 +483,7 @@ function Search() {
       {result?.type === "leaf" && (
         <div>
           <div style={{ fontFamily: mono, fontSize: 12, color: C.green, marginBottom: 12 }}>Found leaf proof</div>
-          <a href={`#/leaf/${result.data.leaf?.hash}`} style={{ fontFamily: mono, fontSize: 12, color: C.gold, textDecoration: "none" }}>View full proof →</a>
+          <a href={`#/leaf/${result.data.leaf?.hash}`} style={{ fontFamily: mono, fontSize: 12, color: C.gold, textDecoration: "none" }}>View full proof ></a>
         </div>
       )}
     </div>
