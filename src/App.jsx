@@ -32,6 +32,7 @@ function Nav() {
   const links = [
     ["#/", "Dashboard"],
     ["#/leaves", "Leaves"],
+    ["#/governance", "Governance"],
     ["#/search", "Search"],
   ];
   return (
@@ -72,6 +73,8 @@ const TYPE_COLORS = {
   DEPLOYMENT: "#60a5fa", HOSTING_PAYMENT: "#f59e0b", SHIELD_RENEWAL: "#22c55e",
   TRANSFER: "#ec4899", EXIT: "#ef4444", MERKLE_ROOT: "#6b7385",
   STAKING_DEPOSIT: "#818cf8", STAKING_WITHDRAW: "#a78bfa", STAKING_REWARD: "#34d399",
+  GOVERNANCE_PROPOSAL: "#f472b6", GOVERNANCE_VOTE: "#38bdf8", GOVERNANCE_RESULT: "#a3e635",
+  AGENT_REGISTER: "#fb923c", AGENT_POLICY: "#e879f9", AGENT_ACTION: "#2dd4bf",
 };
 
 function PieChart({ data }) {
@@ -418,6 +421,134 @@ function LeafDetail({ leafHash }) {
   );
 }
 
+// Governance Page
+function Governance() {
+  const [proposals, setProposals] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(API + "/events?limit=200")
+      .then((r) => r.json())
+      .then((d) => {
+        const events = d.events || [];
+        const govEvents = events.filter((e) => e.event_type.startsWith("GOVERNANCE_"));
+        const grouped = {};
+        for (const ev of govEvents) {
+          const pid = ev.serial_number || "unknown";
+          if (!grouped[pid]) grouped[pid] = { id: pid, proposal: null, votes: [], result: null };
+          if (ev.event_type === "GOVERNANCE_PROPOSAL") grouped[pid].proposal = ev;
+          else if (ev.event_type === "GOVERNANCE_VOTE") grouped[pid].votes.push(ev);
+          else if (ev.event_type === "GOVERNANCE_RESULT") grouped[pid].result = ev;
+        }
+        setProposals(Object.values(grouped));
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div style={{ color: C.dim, fontFamily: mono, fontSize: 12, padding: 40 }}>Loading...</div>;
+
+  const GOV_COLORS = {
+    GOVERNANCE_PROPOSAL: "#f472b6",
+    GOVERNANCE_VOTE: "#38bdf8",
+    GOVERNANCE_RESULT: "#a3e635",
+  };
+
+  return (
+    <div>
+      <div style={{ fontFamily: mono, fontSize: 10, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>Governance</div>
+      <div style={{ fontFamily: mono, fontSize: 12, color: C.dim, marginBottom: 24 }}>
+        On-chain proposals, votes, and results attested via ZAP1 governance events.
+      </div>
+
+      {/* Summary stats */}
+      {proposals && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 32 }}>
+          <Stat label="Proposals" value={proposals.length} color={GOV_COLORS.GOVERNANCE_PROPOSAL} />
+          <Stat label="Total Votes" value={proposals.reduce((s, p) => s + p.votes.length, 0)} color={GOV_COLORS.GOVERNANCE_VOTE} />
+          <Stat label="Results" value={proposals.filter((p) => p.result).length} color={GOV_COLORS.GOVERNANCE_RESULT} />
+        </div>
+      )}
+
+      {/* Proposal cards */}
+      {proposals && proposals.map((p) => (
+        <div key={p.id} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 4, padding: 24, marginBottom: 16 }}>
+          {/* Header */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 3, background: GOV_COLORS.GOVERNANCE_PROPOSAL + "20", color: GOV_COLORS.GOVERNANCE_PROPOSAL, fontFamily: mono, letterSpacing: "0.04em" }}>PROPOSAL</span>
+              <span style={{ fontFamily: mono, fontSize: 14, color: C.white, fontWeight: 600 }}>{p.id}</span>
+            </div>
+            <span style={{
+              fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 3, fontFamily: mono,
+              background: p.result ? GOV_COLORS.GOVERNANCE_RESULT + "20" : C.gold + "20",
+              color: p.result ? GOV_COLORS.GOVERNANCE_RESULT : C.gold,
+            }}>
+              {p.result ? "RESOLVED" : "ACTIVE"}
+            </span>
+          </div>
+
+          {/* Proposal detail */}
+          {p.proposal && (
+            <div style={{ marginBottom: 16, padding: "12px 16px", background: C.bg, borderRadius: 4, border: `1px solid ${C.border}` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <div style={{ fontFamily: mono, fontSize: 10, color: C.muted, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 4 }}>Submitted by</div>
+                  <div style={{ fontFamily: mono, fontSize: 12, color: C.dim }}>{p.proposal.wallet_hash}</div>
+                </div>
+                <a href={`#/leaf/${p.proposal.leaf_hash}`} style={{ fontFamily: mono, fontSize: 11, color: C.gold, textDecoration: "none" }}>Proof ></a>
+              </div>
+            </div>
+          )}
+
+          {/* Votes */}
+          <div style={{ marginBottom: p.result ? 16 : 0 }}>
+            <div style={{ fontFamily: mono, fontSize: 10, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
+              Votes ({p.votes.length})
+            </div>
+            {p.votes.length === 0 && (
+              <div style={{ fontFamily: mono, fontSize: 11, color: C.muted, fontStyle: "italic" }}>No votes recorded yet.</div>
+            )}
+            {p.votes.map((v, i) => (
+              <div key={i} style={{
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+                padding: "8px 16px", background: C.bg, borderRadius: 4, border: `1px solid ${C.border}`,
+                marginBottom: 4,
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: GOV_COLORS.GOVERNANCE_VOTE }} />
+                  <span style={{ fontFamily: mono, fontSize: 12, color: C.white }}>{v.wallet_hash}</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <span style={{ fontFamily: mono, fontSize: 10, color: C.muted }}>{truncHash(v.leaf_hash, 8)}</span>
+                  <a href={`#/leaf/${v.leaf_hash}`} style={{ fontFamily: mono, fontSize: 11, color: C.gold, textDecoration: "none" }}>Proof ></a>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Result */}
+          {p.result && (
+            <div style={{ padding: "12px 16px", background: GOV_COLORS.GOVERNANCE_RESULT + "08", borderRadius: 4, border: `1px solid ${GOV_COLORS.GOVERNANCE_RESULT}22` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 3, background: GOV_COLORS.GOVERNANCE_RESULT + "20", color: GOV_COLORS.GOVERNANCE_RESULT, fontFamily: mono }}>RESULT</span>
+                  <span style={{ fontFamily: mono, fontSize: 11, color: C.dim }}>by {p.result.wallet_hash}</span>
+                </div>
+                <a href={`#/leaf/${p.result.leaf_hash}`} style={{ fontFamily: mono, fontSize: 11, color: C.gold, textDecoration: "none" }}>Proof ></a>
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+
+      {proposals && proposals.length === 0 && (
+        <div style={{ fontFamily: mono, fontSize: 12, color: C.muted, padding: 40, textAlign: "center" }}>No governance events found.</div>
+      )}
+    </div>
+  );
+}
+
 // Search Page
 function Search() {
   const [query, setQuery] = useState("");
@@ -499,6 +630,8 @@ export default function App() {
     page = <LeafDetail leafHash={leafHash} />;
   } else if (hash === "#/leaves") {
     page = <Leaves />;
+  } else if (hash === "#/governance") {
+    page = <Governance />;
   } else if (hash === "#/search") {
     page = <Search />;
   } else {
